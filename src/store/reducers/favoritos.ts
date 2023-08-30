@@ -14,7 +14,6 @@ const favoritosReducer = (state = initialState, action) => {
       } else {
         return { ...state, itens: [...state.itens, action.produto] }
       }
-    // Outros cases aqui, se necessário
     default:
       return state
   }
