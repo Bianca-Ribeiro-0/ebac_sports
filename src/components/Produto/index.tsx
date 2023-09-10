@@ -1,33 +1,55 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { toggleFavorito } from '../store/favoritos'
-import { adicionarAoCarrinho } from '../store/carrinho'
+import { useDispatch } from 'react-redux'
+
+import { Produto as ProdutoType } from '../../App'
 import * as S from './styles'
 
-const ProdutoComponent = ({
-  produto,
-  aoComprar,
-  favoritar,
-  estaNosFavoritos
-}) => {
+import { adicionaCarrinho } from '../../store/reducers/carrinho'
+import { adicionaFavorito } from '../../store/reducers/favoritos'
+import { useState } from 'react'
+
+export type PropsFav = {
+  produto: ProdutoType
+}
+
+//exportando uma constante para a moeda
+export const MoedaReal = (valor: number) =>
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(
+    valor
+  )
+
+const ProdutoComponent = ({ produto }: PropsFav) => {
+  const dispatch = useDispatch()
+
+  const [estaFavoritado, setEstaFavoritado] = useState(false)
+
   return (
     <S.Produto>
-      {/* Renderização do produto aqui */}
-      <S.BtnComprar onClick={() => favoritar(produto)} type="button">
-        {estaNosFavoritos
+      <S.Capa>
+        <img src={produto.imagem} alt={produto.nome} />
+      </S.Capa>
+      <S.Titulo>{produto.nome}</S.Titulo>
+      <S.Prices>
+        <strong>{MoedaReal(produto.preco)}</strong>
+      </S.Prices>
+      <S.BtnComprar
+        onClick={() => {
+          dispatch(adicionaFavorito(produto))
+          setEstaFavoritado(!estaFavoritado)
+        }}
+        type="button"
+      >
+        {estaFavoritado
           ? '- Remover dos favoritos'
           : '+ Adicionar aos favoritos'}
       </S.BtnComprar>
-      <S.BtnComprar onClick={() => aoComprar(produto)} type="button">
+      <S.BtnComprar
+        onClick={() => dispatch(adicionaCarrinho(produto))}
+        type="button"
+      >
         Adicionar ao carrinho
       </S.BtnComprar>
     </S.Produto>
   )
 }
 
-const mapDispatchToProps = (dispatch: (arg0: any) => any) => ({
-  favoritar: (produto: any) => dispatch(toggleFavorito(produto)),
-  aoComprar: (produto: any) => dispatch(adicionarAoCarrinho(produto))
-})
-
-export default connect(null, mapDispatchToProps)(ProdutoComponent)
+export default ProdutoComponent

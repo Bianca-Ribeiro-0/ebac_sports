@@ -1,22 +1,31 @@
-// store/favoritos.ts
-const initialState = {
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+
+import { Produto } from '../../App'
+
+type FavoritoState = {
+  itens: Produto[]
+}
+
+const initialState: FavoritoState = {
   itens: []
 }
 
-const favoritosReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case 'TOGGLE_FAVORITO':
-      if (state.itens.find((p) => p.id === action.produto.id)) {
-        return {
-          ...state,
-          itens: state.itens.filter((p) => p.id !== action.produto.id)
-        }
-      } else {
-        return { ...state, itens: [...state.itens, action.produto] }
-      }
-    default:
-      return state
-  }
-}
+const favoritoSlice = createSlice({
+  name: 'favorito',
+  initialState,
+  reducers: {
+    adicionaFavorito: (state, action: PayloadAction<Produto>) => {
+      const favoritos = action.payload
 
-export default favoritosReducer
+      if (state.itens.find((fav) => fav.id === favoritos.id)) {
+        state.itens = state.itens.filter((fav) => fav.id !== favoritos.id)
+      } else {
+        state.itens.push(favoritos)
+      }
+    }
+  }
+})
+
+export const { adicionaFavorito } = favoritoSlice.actions
+
+export default favoritoSlice.reducer
